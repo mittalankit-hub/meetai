@@ -40,6 +40,7 @@ export default function Home() {
   }
 
   if(session){
+    console.log("Session: -------- ",session)
     return(
       <div className="flex flex-col gap-y-4">
         <p>Logged in as user : {session.user.name}</p>

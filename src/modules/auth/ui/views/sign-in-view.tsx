@@ -86,6 +86,7 @@ export const SignInView = ()=>{
                                     )}>
                                     </FormField>
                                     </div>
+
                                     <div className="grid gap-3">
                                     <FormField control={form.control}
                                     name="password"
@@ -120,7 +121,7 @@ export const SignInView = ()=>{
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <Button variant="outline" className="w-full" type="button" disabled={pending}>Google</Button>
-                                    <Button variant="outline" className="w-full" type="button" disabled={pending}>Github</Button>
+                                    <Button variant="outline" className="w-full" type="button" disabled={pending} onClick={()=>{authClient.signIn.social({provider:"github",})}}>Github</Button>
                                 </div>
                                 <div className="text-center text-sm">
                                     Don&apos;t have an account? <Link href="/sign-up" className="underline underline-offset-4">Sign up {" "}</Link>

@@ -13,7 +13,7 @@ import Link from "next/link"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-
+import {FaGithub,FaGoogle} from "react-icons/fa"
 
 
 
@@ -21,6 +21,7 @@ export const SignUpView = ()=>{
 
     const [error,setError] = useState<string | null>(null)
     const [pending,setPending] = useState(false)
+    const router = useRouter()
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         setError(null)
@@ -38,6 +39,7 @@ export const SignUpView = ()=>{
             },
             onSuccess: () => {
                 setPending(false)
+                router.push("/") // Redirect to home page after successful sign up
             },
         })
         
@@ -177,8 +179,8 @@ export const SignUpView = ()=>{
                                     </>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Button variant="outline" className="w-full" type="button" disabled={pending} onClick={()=>onSocial("google")}>Google</Button>
-                                    <Button variant="outline" className="w-full" type="button" disabled={pending} onClick={()=>onSocial("github")}>Github</Button>
+                                    <Button variant="outline" className="w-full" type="button" disabled={pending} onClick={()=>onSocial("google")}><FaGoogle /></Button>
+                                    <Button variant="outline" className="w-full" type="button" disabled={pending} onClick={()=>onSocial("github")}><FaGithub /></Button>
                                 </div>
                                 <div className="text-center text-sm">
                                     Already have an account? <Link href="/sign-in" className="underline underline-offset-4">Sign in {" "}</Link>

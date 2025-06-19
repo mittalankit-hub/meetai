@@ -1,24 +1,11 @@
 "use client"
-import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { HomePage } from "@/modules/home/ui/views/home-view";
 
- 
- 
- 
- const Page = () => {
-  const {data:sesssion} = authClient.useSession()
-  if(!sesssion){
-    return(
-      <div>Loading....</div>
-    )
-  }
+
+ export const Page = () => {
+
   return (
-    <div className="flex flex-col p-4 gap-4">
-      <p>Logged in as {sesssion.user?.name} </p>
-      <Button onClick={()=>authClient.signOut()}>
-        Sign out
-      </Button>
-    </div>
+    <HomePage/>
   )
 }
 

@@ -1,12 +1,22 @@
-"use client"
+import { auth } from "@/lib/auth";
 import { HomePage } from "@/modules/home/ui/views/home-view";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 
- export const Page = () => {
+ export const Page = async() => {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    //console.log("inside root page: Session ->", session)
 
-  return (
-    <HomePage/>
-  )
+    if(!session) {
+      redirect("/sign-in");
+    }
+
+    return (
+      <HomePage/>
+    )
 }
 
 export default Page;

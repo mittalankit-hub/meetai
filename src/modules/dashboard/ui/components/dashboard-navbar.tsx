@@ -18,7 +18,7 @@ export const DashboardNavbar = ()=> {
             }
         };
         document.addEventListener("keydown", down);
-        document.removeEventListener("keydown", down);
+        //document.removeEventListener("keydown", down);
         return () => {
             document.removeEventListener("keydown", down);
         }

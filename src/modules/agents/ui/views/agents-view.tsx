@@ -11,7 +11,6 @@ export const AgentView = () => {
     const {data} = useSuspenseQuery(trpc.agents.getMany.queryOptions())
 
     
-    
     return(
         <div>
             {JSON.stringify(data, null, 2)} 

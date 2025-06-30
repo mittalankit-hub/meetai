@@ -10,7 +10,7 @@ interface Props{
 export const DataPagination = ({page,totalPages,onPageChange,}:Props)=>{
     return(
         <div className="flex items-center justify-between">
-            <div flex-1 text-sm text-muted-foreground>
+            <div className="flex-1 text-sm text-muted-foreground">
                 Page {page} of {totalPages || 1}
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">

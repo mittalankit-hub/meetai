@@ -3,7 +3,8 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import {agents} from "@/db/schema";
 import { AgentInsertSchema } from "../schema";
 import z from "zod";
-import { eq, getTableColumns, sql } from "drizzle-orm";
+import { and, count, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
+import { DEFAULT_PAGE_NUM, DEFAULT_PAGE_SIZE, PAGE_SIZE_MAX, PAGE_SIZE_MIN } from "@/constants";
 
 
 
@@ -19,14 +20,53 @@ export const agentsRouter = createTRPCRouter({
 
 
 
-    getMany: protectedProcedure.query(async ()=>{
-        const data = await db.select({ meetingCount:sql<number>`5`,
-            ...getTableColumns(agents)}).from(agents);
+    getMany: protectedProcedure
+        .input(z.object({
+            page: z.number().default(DEFAULT_PAGE_NUM),
+            pageSize: z.number().min(PAGE_SIZE_MIN).max(PAGE_SIZE_MAX).default(DEFAULT_PAGE_SIZE),
+            search:z.string().nullish(),
+            })
+        )
+        .query(async ({ctx,input})=>{
+            const{search,page,pageSize} = input;
+            const data = await db
+                .select(
+                {
+                    meetingCount: sql<number> `1`,
+                    ...getTableColumns(agents)
+                })
+                .from(agents)
+                .where(
+                    and(
+                        eq(agents.userId,ctx.auth.user.id),
+                        search ? ilike(agents.name, `%${search}%`) : undefined
+                    )
+                )
+                .orderBy(desc(agents.createdAt),desc(agents.id))
+                .limit(pageSize)
+                .offset( (page-1) * pageSize );
 
-    //await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate a delay for demonstration purposes
-    //throw new Error("Simulated error for testing purposes");
-        return data;
-    }),
+                const [total] = await db
+                .select({count: count()})
+                .from(agents)
+                .where(
+                    and(
+                        eq(agents.userId,ctx.auth.user.id),
+                        search ? ilike(agents.name, `%${search}%`) : undefined
+                    )
+                )
+
+                const totalPages  = Math.ceil(total.count / pageSize)
+
+            //await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate a delay for demonstration purposes
+            //throw new Error("Simulated error for testing purposes");
+            return {
+                items:data,
+                total:total.count,
+                totalPages: totalPages,
+            };
+            }
+        ),
 
     create: protectedProcedure.input(AgentInsertSchema).mutation(async ({input,ctx})=>{
 

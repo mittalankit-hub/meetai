@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 
 export const DashabordUserButton = () => {
-  console.log("Rendering DashboardUserButton");
+  //console.log("Rendering DashboardUserButton");
   const {data} = authClient.useSession();
   const router = useRouter();
   const isMobile =useIsMobile()

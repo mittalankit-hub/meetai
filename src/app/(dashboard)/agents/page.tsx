@@ -19,7 +19,7 @@ const Agents = async() => {
     }
     const queryClient = getQueryClient()
     // This is where you can prefetch data if needed
-    queryClient.prefetchQuery(trpc.agents.getMany.queryOptions())
+    queryClient.prefetchQuery(trpc.agents.getMany.queryOptions({}))
 
   return (
     <>

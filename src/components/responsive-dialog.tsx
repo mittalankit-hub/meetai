@@ -14,7 +14,7 @@ export const ResponsiveDialog = ({title,description,children, open, onOpenChange
 
     const isMobile = useIsMobile();
     
-    console.log("Open: ",open)
+    //console.log("Open: ",open)
     if (isMobile) {
         return (
         <Drawer open={open} onOpenChange={onOpenChange}>

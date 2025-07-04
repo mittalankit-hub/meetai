@@ -47,6 +47,24 @@ export const AgentForm = ({onSuccess,onCancel,initialValues}:AgentFormProps) => 
         })
     )
 
+    const updateAgent = useMutation(
+        trpc.agents.update.mutationOptions({
+            onSuccess:async () =>{
+               await  queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}))
+               
+               if((initialValues?.id)){
+                    await queryClient.invalidateQueries(trpc.agents.getOne.queryOptions({id: initialValues.id}))
+                }
+                
+                onSuccess?.()
+            },
+            onError: (error) => {
+                toast.error(error.message)
+            },
+
+            //TODO: check if error code FORBIDDEN , redirect to /upgrade
+        })
+    )
 
     const form = useForm<z.infer<typeof AgentInsertSchema>>({
         resolver: zodResolver(AgentInsertSchema),
@@ -57,13 +75,13 @@ export const AgentForm = ({onSuccess,onCancel,initialValues}:AgentFormProps) => 
         })
 
     const isEdit = !!initialValues;
-    const isPending = createAgent.isPending;
+    const isPending = createAgent.isPending || updateAgent.isPending;
 
 
     const onSubmit = (values: z.infer<typeof AgentInsertSchema>) => {
             
         if(isEdit){
-            console.log("Edit agent not implemented yet - TODO");
+            //updateAgent.mutate(values)
         }
         else {
             createAgent.mutate(values)

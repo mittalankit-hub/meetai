@@ -13,6 +13,8 @@ interface Props {
 }
 
 export const AgentIdViewHeader = ({ agentId, agentName, onEdit, onRemove }: Props) => {
+    
+
     return (
         <div className="flex items-center justify-between">
             <Breadcrumb>

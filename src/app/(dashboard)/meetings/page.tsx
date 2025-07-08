@@ -9,6 +9,7 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import type { SearchParams } from 'nuqs'
 import { loadSearchParams } from '@/modules/agents/params'
+import { MeetingListHeader } from '@/modules/meetings/ui/components/meeting-list-header'
 
 interface Props {
   searchParams: Promise<SearchParams>
@@ -29,10 +30,20 @@ const Meetings = async({searchParams}:Props) => {
     queryClient.prefetchQuery(trpc.meetings.getMany.queryOptions({
     ...filters
     }))
+    queryClient.prefetchQuery(trpc.agents.getAgentListForDropdown.queryOptions())
+  
 
   return (
     <>
-    {/* <MeetingListHeader /> */}
+
+    <HydrationBoundary state={dehydrate(queryClient)}>
+        <Suspense>
+
+              <MeetingListHeader />
+
+        </Suspense>
+    </HydrationBoundary>
+    
     <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<MeetingLoadingView/>}>
             <ErrorBoundary fallback={<MeetingErrorView/>}>

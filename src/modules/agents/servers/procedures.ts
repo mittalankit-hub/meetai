@@ -29,6 +29,21 @@ export const agentsRouter = createTRPCRouter({
         return existingAgent;   
     }),
 
+    getAgentListForDropdown: protectedProcedure
+    .query(async ({ctx})=>{
+        
+        const data = await db
+            .select()
+            .from(agents)
+            .where(eq(agents.userId,ctx.auth.user.id),)
+            .orderBy(desc(agents.name))
+
+
+        //await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate a delay for demonstration purposes
+        //throw new Error("Simulated error for testing purposes");
+        return data
+        }
+    ),
 
 
     getMany: protectedProcedure

@@ -5,21 +5,21 @@ import { AgentForm } from "./agent-form";
 interface Props{
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    data: AgentGetOne
+    initialValues: AgentGetOne
 }
 
-export const AgentEditDialog = ({open, onOpenChange, data}: Props) => {
+export const AgentEditDialog = ({open, onOpenChange, initialValues}: Props) => {
     
 
     return (
         <ResponsiveDialog
             open={open}
             onOpenChange={onOpenChange}
-            title={`Edit Agent: ${data.name}`}
+            title={`Edit Agent: ${initialValues.name}`}
             description="Modify the details of your agent."
         >
             <AgentForm 
-                initialValues={data}
+                initialValues={initialValues}
                 onSuccess={() => onOpenChange(false)}
                 onCancel={() => onOpenChange(false)}
             />

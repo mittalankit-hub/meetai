@@ -8,11 +8,10 @@ import { AgentIdViewHeader } from "../components/agent-id-view-header"
 import { GeneratedAvatar } from "@/components/generated-avatar"
 import { Badge } from "@/components/ui/badge"
 import { VideoIcon } from "lucide-react"
-import { use, useState } from "react"
+import { useState } from "react"
 import { AgentEditDialog } from "../components/edit-agent-dialog"
-import { set } from "date-fns"
 import { toast } from "sonner"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useConfirm } from "@/hooks/use-confirm"
 
 
@@ -24,7 +23,7 @@ export const AgentIdView = ({ agentId }: Props) => {
 
     const trpc = useTRPC()
     const { data } = useSuspenseQuery(trpc.agents.getOne.queryOptions({ id: agentId }))
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [updateDialogOpen, setUpdateIsDialogOpen] = useState(false)
     const queryClient = useQueryClient()
     const router = useRouter()
     
@@ -59,7 +58,7 @@ export const AgentIdView = ({ agentId }: Props) => {
         await removeAgent.mutateAsync({id: agentId})
     }
 
-    const isPending = removeAgent.isPending
+    //const isPending = removeAgent.isPending
 
     // if(isPending){
     //     return(
@@ -71,12 +70,12 @@ export const AgentIdView = ({ agentId }: Props) => {
         
     <>
         <RemoveConfirmation />
-        <AgentEditDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} data={data}/>
+        <AgentEditDialog open={updateDialogOpen} onOpenChange={setUpdateIsDialogOpen} initialValues={data}/>
         <div className="flex-1 py-4 px-4 md:px-8 flex flex-col gap-y-4">
                 <AgentIdViewHeader 
                 agentId={agentId}
                 agentName={data.name}
-                onEdit = {()=>{setIsDialogOpen(true)}}
+                onEdit = {()=>{setUpdateIsDialogOpen(true)}}
                 onRemove = {handleRemoveAgent}
                 />
 

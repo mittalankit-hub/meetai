@@ -33,10 +33,7 @@ export const AgentForm = ({onSuccess,onCancel,initialValues}:AgentFormProps) => 
             onSuccess:async () =>{
                await  queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}))
                
-               if((initialValues?.id)){
-                    await queryClient.invalidateQueries(trpc.agents.getOne.queryOptions({id: initialValues.id}))
-                }
-                
+               //TODO: Invalidate free tier usage 
                 onSuccess?.()
             },
             onError: (error) => {
@@ -81,7 +78,7 @@ export const AgentForm = ({onSuccess,onCancel,initialValues}:AgentFormProps) => 
     const onSubmit = (values: z.infer<typeof AgentInsertSchema>) => {
             
         if(isEdit){
-            //updateAgent.mutate(values)
+            updateAgent.mutate({...values , id: initialValues.id })
         }
         else {
             createAgent.mutate(values)

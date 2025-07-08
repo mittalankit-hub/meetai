@@ -13,6 +13,7 @@ import { AgentEditDialog } from "../components/edit-agent-dialog"
 import { set } from "date-fns"
 import { toast } from "sonner"
 import { redirect, useRouter } from "next/navigation"
+import { useConfirm } from "@/hooks/use-confirm"
 
 
 interface Props{
@@ -28,7 +29,7 @@ export const AgentIdView = ({ agentId }: Props) => {
     const router = useRouter()
     
     
-    const removedAgent = useMutation(
+    const removeAgent = useMutation(
         trpc.agents.remove.mutationOptions({
             onSuccess:async () =>{
                 await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}))
@@ -44,24 +45,39 @@ export const AgentIdView = ({ agentId }: Props) => {
             //TODO: check if error code FORBIDDEN , redirect to /upgrade
         })
     )
-    const isPending = removedAgent.isPending
+    
+    const [RemoveConfirmation, confirmRemove] = useConfirm(
+        "Are you sure you want to delete this agent?",
+        `This following action will ${data.meetingCount} meeting associated with this agent.`,
 
-    if(isPending){
-        return(
-            <LoadingState title="Deleting Agent" description="Please wait while we delete the agent..." />
-        )
+    )
+    const handleRemoveAgent = async()=>{
+        console.log("Inside handleRemove: Removing agent with ID:", agentId);
+        const ok = await confirmRemove();
+        console.log("Inside handleRemove Confirmation result:", ok);
+        if(!ok) return;
+        await removeAgent.mutateAsync({id: agentId})
     }
+
+    const isPending = removeAgent.isPending
+
+    // if(isPending){
+    //     return(
+    //         <LoadingState title="Deleting Agent" description="Please wait while we delete the agent..." />
+    //     )
+    // }
 
     return(
         
     <>
+        <RemoveConfirmation />
         <AgentEditDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} data={data}/>
         <div className="flex-1 py-4 px-4 md:px-8 flex flex-col gap-y-4">
                 <AgentIdViewHeader 
                 agentId={agentId}
                 agentName={data.name}
                 onEdit = {()=>{setIsDialogOpen(true)}}
-                onRemove = {()=>removedAgent.mutate({id: agentId})}
+                onRemove = {handleRemoveAgent}
                 />
 
         <div className="bg-white rounded-lg border">

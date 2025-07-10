@@ -156,7 +156,7 @@ export const MeetingForm = ({onSuccess,onCancel,initialValues}:MeetingFormProps)
                                     </FormField>
                                     <FormDescription>
                                         Not Found what you&apos;re looking for? {" "}
-                                        <button type="button" className="text-primary hover:underline" onClick={setOpenNewAgentDialog}>Create new Agent</button> 
+                                        <button type="button" className="text-primary hover:underline" onClick={() => setOpenNewAgentDialog(true)}>Create new Agent</button> 
                                     </FormDescription>
                               
                                 

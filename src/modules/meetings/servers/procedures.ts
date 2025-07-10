@@ -1,7 +1,7 @@
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { db } from "@/db";
-import { meetings, meetingStatus } from "@/db/schema";
-import { and,count,desc,eq, getTableColumns, ilike } from "drizzle-orm";
+import { agents, meetings, meetingStatus } from "@/db/schema";
+import { and,count,desc,eq, getTableColumns, ilike, sql } from "drizzle-orm";
 import z from "zod";
 import { DEFAULT_PAGE_NUM, DEFAULT_PAGE_SIZE, PAGE_SIZE_MAX, PAGE_SIZE_MIN } from "@/constants";
 import { TRPCError } from "@trpc/server";
@@ -48,7 +48,12 @@ export const meetingsRouter = createTRPCRouter({
             const [existingMeeting] = await db.select(
                 // TODO: change to actual count
                 { 
-                ...getTableColumns(meetings)}).from(meetings).where(
+                ...getTableColumns(meetings),
+                agent: agents,
+                duration: sql<number>`EXTRACT(EPOCH FROM (meetings."endTime" - meetings."startTime"))`.as("duration"),})
+                .from(meetings)
+                .innerJoin(agents, eq(meetings.agentId, agents.id)) 
+                .where(
                     and(eq(meetings.id, input.id),
                         eq(meetings.userId,ctx.auth.session.userId)
                        ));
@@ -77,9 +82,12 @@ export const meetingsRouter = createTRPCRouter({
                     .select(
                     {
                         
-                        ...getTableColumns(meetings)
+                        ...getTableColumns(meetings),
+                        agent: agents,
+                        duration: sql<number>`EXTRACT(EPOCH FROM (meetings."ended_at" - meetings."started_at"))`.as("duration"),
                     })
                     .from(meetings)
+                    .innerJoin(agents, eq(meetings.agentId, agents.id)) 
                     .where(
                         and(
                             eq(meetings.userId,ctx.auth.user.id),
@@ -94,6 +102,7 @@ export const meetingsRouter = createTRPCRouter({
                     const [total] = await db
                     .select({count: count()})
                     .from(meetings)
+                    .innerJoin(agents, eq(meetings.agentId, agents.id))
                     .where(
                         and(
                             eq(meetings.userId,ctx.auth.user.id),

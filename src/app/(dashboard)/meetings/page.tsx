@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import type { SearchParams } from 'nuqs'
-import { loadSearchParams } from '@/modules/agents/params'
+import { loadSearchParams } from '@/modules/meetings/params'
 import { MeetingListHeader } from '@/modules/meetings/ui/components/meeting-list-header'
 
 interface Props {

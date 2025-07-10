@@ -1,11 +1,12 @@
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { db } from "@/db";
-import { agents, meetings, meetingStatus } from "@/db/schema";
+import { agents, meetings } from "@/db/schema";
 import { and,count,desc,eq, getTableColumns, ilike, sql } from "drizzle-orm";
 import z from "zod";
 import { DEFAULT_PAGE_NUM, DEFAULT_PAGE_SIZE, PAGE_SIZE_MAX, PAGE_SIZE_MIN } from "@/constants";
 import { TRPCError } from "@trpc/server";
 import { MeetingInsertSchema, MeetingUpdateSchema } from "../schema";
+import { MeetingStatus } from "../types";
 
 
 
@@ -73,11 +74,17 @@ export const meetingsRouter = createTRPCRouter({
                 page: z.number().default(DEFAULT_PAGE_NUM),
                 pageSize: z.number().min(PAGE_SIZE_MIN).max(PAGE_SIZE_MAX).default(DEFAULT_PAGE_SIZE),
                 search:z.string().nullish(),
-                status: z.enum(meetingStatus.enumValues).nullish(),
-                })
-            )
+                status:z.enum([
+                    MeetingStatus.Upcoming,
+                    MeetingStatus.Active,
+                    MeetingStatus.Completed,
+                    MeetingStatus.Cancelled,
+                    MeetingStatus.Processing,
+                ]).nullish(),
+                agentId: z.string().nullish(),
+            }))
             .query(async ({ctx,input})=>{
-                const{search,page,pageSize,status} = input;
+                const{search,page,pageSize,status,agentId} = input;
                 const data = await db
                     .select(
                     {
@@ -92,7 +99,8 @@ export const meetingsRouter = createTRPCRouter({
                         and(
                             eq(meetings.userId,ctx.auth.user.id),
                             search ? ilike(meetings.name, `%${search}%`) : undefined,
-                            status ? eq(meetings.status, status) : undefined
+                            status ? eq(meetings.status, status) : undefined,
+                            agentId ? eq(meetings.agentId, agentId) : undefined
                         )
                     )
                     .orderBy(desc(meetings.createdAt),desc(meetings.id))
@@ -106,7 +114,9 @@ export const meetingsRouter = createTRPCRouter({
                     .where(
                         and(
                             eq(meetings.userId,ctx.auth.user.id),
-                            search ? ilike(meetings.name, `%${search}%`) : undefined
+                            search ? ilike(meetings.name, `%${search}%`) : undefined,
+                            status ? eq(meetings.status, status) : undefined,
+                            agentId ? eq(meetings.agentId, agentId) : undefined
                         )
                     )
     

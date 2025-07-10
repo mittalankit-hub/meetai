@@ -7,7 +7,7 @@ import { DataTable } from "@/components/ui/data-table"
 import { columns } from "../components/data-table-columns"
 import { EmptyState } from "@/components/empty-state"
 import { useMeetingsFilters } from "../../hooks/use-meetings-filters"
-import { DataPagination } from "../components/data-pagination"
+import { DataPagination } from "@/components/data-pagination"
 import {  useRouter } from "next/navigation"
 
 

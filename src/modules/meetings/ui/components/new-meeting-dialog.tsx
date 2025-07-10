@@ -1,14 +1,13 @@
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { MeetingForm } from "./meeting-form";
-import { AgentListForDropdown } from "@/modules/agents/types";
+
 
 interface MeetingNewDialogProps {
     open: boolean;
-    agentList: AgentListForDropdown; // Adjust type as needed
     onOpenChange: (open: boolean) => void;
 }
 
-export const MeetingNewDialog = ({open,onOpenChange,agentList} : MeetingNewDialogProps) => {
+export const MeetingNewDialog = ({open,onOpenChange,} : MeetingNewDialogProps) => {
     return (
         <ResponsiveDialog
             open={open}
@@ -19,7 +18,6 @@ export const MeetingNewDialog = ({open,onOpenChange,agentList} : MeetingNewDialo
             <MeetingForm 
             onSuccess={ () => onOpenChange(false) }
             onCancel={() => onOpenChange(false)}    
-            agentList={agentList} // Pass the agent list to the form
             />
         </ResponsiveDialog>   
     )

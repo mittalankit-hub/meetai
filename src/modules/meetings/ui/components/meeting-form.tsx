@@ -3,30 +3,44 @@ import { useForm } from "react-hook-form";
 import { MeetingInsertSchema } from "../../schema"
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MeetingGetOne } from "../../types";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AgentListForDropdown } from "@/modules/agents/types";
+import { useState } from "react";
+import { CommandSelect } from "@/components/command-select";
+import { GeneratedAvatar } from "@/components/generated-avatar";
+import { useRouter } from "next/navigation";
+import AgentNewDialog from "@/modules/agents/ui/components/new-agent-dialog";
+
 
 interface MeetingFormProps{
     onSuccess?: (id?:string) => void;
     onCancel?: () => void;
     initialValues?: MeetingGetOne;
-    agentList: AgentListForDropdown;
 }
 
 
 
-export const MeetingForm = ({onSuccess,onCancel,initialValues,agentList}:MeetingFormProps) => {
+export const MeetingForm = ({onSuccess,onCancel,initialValues}:MeetingFormProps) => {
 
 
     const trpc = useTRPC()
     const queryClient = useQueryClient()
+    const [agentSearch,setAgentSearch] = useState("");
+    const router = useRouter()
+    const [openNewAgentDialog, setOpenNewAgentDialog] = useState(false);
+
+    const agents = useQuery(
+        trpc.agents.getMany.queryOptions({
+            pageSize: 100,
+            search:agentSearch // Fetch a reasonable number of agents for the dropdown
+        }),
+    )
+
 
     const createMeeting = useMutation(
         trpc.meetings.create.mutationOptions({
@@ -83,13 +97,15 @@ export const MeetingForm = ({onSuccess,onCancel,initialValues,agentList}:Meeting
         }
         else {
             createMeeting.mutate(values)
+            router.push(`/meetings/${values.agentId}`)
         }
     }
     
   
 
     return(
-        
+        <>
+                    <AgentNewDialog open={openNewAgentDialog} onOpenChange={setOpenNewAgentDialog}/>
                     <Form{...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                                 
@@ -118,23 +134,30 @@ export const MeetingForm = ({onSuccess,onCancel,initialValues,agentList}:Meeting
                                                     Agent
                                                 </FormLabel>
                                                 <FormControl>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select an agent" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {agentList?.map((agent) => (
-                                                            <SelectItem key={agent.id} value={agent.id}>
-                                                                {agent.name}
-                                                            </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <CommandSelect
+                                                        options={(agents.data?.items ?? []).map((agent) => ({
+                                                            id: agent.id,
+                                                            value: agent.id,
+                                                            children: (
+                                                                <div className="flex items-center gap-x-2">
+                                                                    <GeneratedAvatar seed={agent.name} variant="botttsNeutral" className="border size-6"/>
+                                                                    <span>{agent.name}</span>
+                                                                </div>
+                                                            )
+                                                        }))}
+                                                        onSelect={field.onChange}
+                                                        onSearch={setAgentSearch}
+                                                        value={field.value}
+                                                        placeholder="Select an agent"/>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}>
                                     </FormField>
+                                    <FormDescription>
+                                        Not Found what you&apos;re looking for? {" "}
+                                        <button type="button" className="text-primary hover:underline" onClick={setOpenNewAgentDialog}>Create new Agent</button> 
+                                    </FormDescription>
                               
                                 
                        
@@ -152,6 +175,6 @@ export const MeetingForm = ({onSuccess,onCancel,initialValues,agentList}:Meeting
                             
                         </form>
                     </Form>
-        
+        </>
     )
 }

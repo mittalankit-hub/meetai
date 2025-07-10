@@ -30,20 +30,12 @@ const Meetings = async({searchParams}:Props) => {
     queryClient.prefetchQuery(trpc.meetings.getMany.queryOptions({
     ...filters
     }))
-    queryClient.prefetchQuery(trpc.agents.getAgentListForDropdown.queryOptions())
   
 
   return (
     <>
 
-    <HydrationBoundary state={dehydrate(queryClient)}>
-        <Suspense>
-
-              <MeetingListHeader />
-
-        </Suspense>
-    </HydrationBoundary>
-    
+    <MeetingListHeader />
     <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<MeetingLoadingView/>}>
             <ErrorBoundary fallback={<MeetingErrorView/>}>

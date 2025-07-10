@@ -32,7 +32,6 @@ export const AgentForm = ({onSuccess,onCancel,initialValues}:AgentFormProps) => 
         trpc.agents.create.mutationOptions({
             onSuccess:async () =>{
                await  queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}))
-               await  queryClient.invalidateQueries(trpc.agents.getAgentListForDropdown.queryOptions())
                
                //TODO: Invalidate free tier usage 
                 onSuccess?.()

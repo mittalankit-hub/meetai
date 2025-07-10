@@ -2,8 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { MeetingGetOne } from "../../types"
-import { GeneratedAvatar } from "@/components/generated-avatar"
-import { CornerDownRightIcon } from "lucide-react"
+
 
 
 // This type is used to define the shape of our data.

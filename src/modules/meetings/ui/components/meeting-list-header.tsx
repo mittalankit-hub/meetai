@@ -5,8 +5,6 @@ import { MeetingNewDialog } from "./new-meeting-dialog";
 import { useState } from "react";
 import { DEFAULT_PAGE_NUM } from "@/constants";
 import { useMeetingsFilters } from "../../hooks/use-meetings-filters";
-import { useTRPC } from "@/trpc/client";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { MeetingsSearchFilters } from "./meetings-search-filters";
 import { meetingStatus } from "@/db/schema";
 
@@ -14,9 +12,9 @@ import { meetingStatus } from "@/db/schema";
 export const MeetingListHeader = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [filters,setFilters] = useMeetingsFilters()
-    const trpc = useTRPC()
+
     const isAnyFilterModified = !!filters.search || (filters.status !== null)
-    const {data} = useSuspenseQuery(trpc.agents.getAgentListForDropdown.queryOptions())
+
 
     const onClearFilters = ()=>{
         setFilters({
@@ -33,7 +31,7 @@ export const MeetingListHeader = () => {
     };
   return (
     <>
-    <MeetingNewDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} agentList={data}/>
+    <MeetingNewDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}/>
         <div className="flex flex-col py-4 px-8 md:px-8 gap-y-5">
             <div className="flex items-center justify-between">
                 <h5 className="font-medium text-xl">My Meetings</h5>

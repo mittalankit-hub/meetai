@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { generateAvaterUri } from "@/lib/avatar"
 
 import "@stream-io/video-react-sdk/dist/css/styles.css"
+import Link from "next/link"
 
 interface Props {
     onJoin: ()=>void;
@@ -18,10 +19,7 @@ const DisabledVideoPreview =()=>{
         <DefaultVideoPlaceholder participant={
             {
                 name:data?.user.name ?? "",
-                image:data?.user.image ?? generateAvaterUri({
-                    seed: data?.user.name ?? "",
-                    variant: "initials"
-                })
+                image:data?.user.image ?? generateAvaterUri({seed: data?.user.name ?? "",variant: "initials"})
             } as StreamVideoParticipant
         }/>
     )
@@ -57,6 +55,22 @@ export const CallLoby = ({onJoin}:Props)=>{
                     <VideoPreview DisabledVideoPreview={
                         hasBrowserMediaPermission ? DisabledVideoPreview : AllowBrowserPermission
                     }/>
+                    <div className="flex gap-x-2">
+                        <ToggleAudioPreviewButton />
+                        <ToggleVideoPreviewButton />
+                    </div>
+                    <div className="flex gap-x-2 justify-between w-full">
+                        <Button asChild variant="ghost">
+                            <Link href="/meetings">
+                                Cancel
+                            </Link>
+                        </Button>
+                        <Button onClick={onJoin}>
+                            <LogInIcon/>
+                            Join Call
+                        </Button>
+
+                    </div>
                 </div>
             </div>
         </div>

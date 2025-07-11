@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {StreamTheme, useCall} from "@stream-io/video-react-sdk"
 import { CallLoby } from "./call-lobby";
+import { CallActive } from "./call-active";
+import { CallEnded } from "./call-ended";
 
 interface Props {
     meetingName:string;
@@ -19,15 +21,28 @@ export const CallUI = ({meetingName}:Props)=>{
 
     const handleLeave = async ()=>{
         if(!call) return;
+
+        const state = call?.state.callingState
+        
+        // if(state === "left"){
+        //     setShow("ended")
+        //     return
+        // }
+        try{
         await call.leave()
         setShow("ended")
+        }catch(error){
+            console.log("Error while leaving the call:",error)
+        } finally{
+            setShow("ended")
+        }
     }
 
     return(
         <StreamTheme className="h-full">
             {show==="lobby" && <CallLoby onJoin={handleJoin}/>}
-            {show==="call" && <p>Call</p>}
-            {show==="ended" && <p>Ended</p>}
+            {show==="call" && <CallActive meetingName={meetingName} onLeave={handleLeave}/>}
+            {show==="ended" && <CallEnded />}
         </StreamTheme>
     )
 }

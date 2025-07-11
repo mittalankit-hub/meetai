@@ -4,7 +4,7 @@ import { ErrorState } from "@/components/error-state"
 import { LoadingState } from "@/components/loading-state"
 import { useTRPC } from "@/trpc/client"
 import { useQueryClient, useSuspenseQuery, useMutation } from "@tanstack/react-query"
-import { GeneratedAvatar } from "@/components/generated-avatar"
+//import { GeneratedAvatar } from "@/components/generated-avatar"
 // import { Badge } from "@/components/ui/badge"
 // import { VideoIcon } from "lucide-react"
 import { useState } from "react"
@@ -13,6 +13,10 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useConfirm } from "@/hooks/use-confirm"
 import { MeetingIdViewHeader } from "../components/meeting-id-view-header"
+import { UpcomingState } from "../components/upcoming-state"
+import { ActiveState } from "../components/active-state"
+import { CancelledState } from "../components/cancelled-state"
+import { ProcessingState } from "../components/processing-state"
 
 
 interface Props{
@@ -59,13 +63,12 @@ export const MeetingIdView = ({ meetingId }: Props) => {
         await removeMeeting.mutateAsync({id: meetingId})
     }
 
-    //const isPending = removeAgent.isPending
+    const isActive = data.status === "active"
+    const isCompleted = data.status === "completed"
+    const isCancelled = data.status === "cancelled" 
+    const isUpcoming = data.status === "upcoming"
+    const isProcessing = data.status === "processing"
 
-    // if(isPending){
-    //     return(
-    //         <LoadingState title="Deleting Agent" description="Please wait while we delete the agent..." />
-    //     )
-    // }
 
     return(
         
@@ -80,36 +83,11 @@ export const MeetingIdView = ({ meetingId }: Props) => {
                 onRemove = {handleRemoveMeeting}
                 />
 
-        <div className="bg-white rounded-lg border">
-            <div className="px-4 py-5 gap-y-5 flex flex-col col-span-5">
-                <div className="flex items-center gap-x-3 ">
-
-                    <h2 className="text-2xl font-medium">
-                        {data.name}
-                    </h2>
-                </div>
-                {/* <Badge
-                variant="outline"
-                className="flex items-center gap-x-2 [&>svg]:size-4"
-                >
-                   <VideoIcon className="text-blue-700"/>   
-                   {data.meetingCount}{ data.meetingCount === 1 ? " Meeting" : " Meetings"}
-                </Badge> */}
-                <div className="flex flex-col gap-y-4">
-                    <p className="text-l font-medium">Agent</p>
-                    
-                    <p className="text-neutral-800">
-                        <GeneratedAvatar 
-                        variant="botttsNeutral"
-                        seed={data.agent.name}
-                        className="size-10"
-                        />
-                        
-                        {data.agent.name}</p>
-                </div>
-            </div>
-
-        </div>
+            { isActive && <ActiveState meetingId={meetingId} /> }
+            { isCompleted && <div>Completed</div>}
+            { isCancelled && <CancelledState /> }
+            { isUpcoming && <UpcomingState meetingId="meetingId" onCancelMeeting={()=>{}} isCancelling={false}/>}
+            { isProcessing && <ProcessingState /> }
     </div>
     </>
     )

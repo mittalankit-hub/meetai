@@ -23,9 +23,13 @@ const session = await auth.api.getSession({
     if(!session) {
           redirect("/sign-in");
         }
-
+    
     const queryClient = getQueryClient()
+    try{
     queryClient.prefetchQuery(trpc.meetings.getOne.queryOptions({id:meetingId}))
+    }catch(error){
+        throw error
+    }
 
     // TODO: prefetch 'meetings.getTranscript'
 

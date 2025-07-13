@@ -38,11 +38,10 @@ export const CallLoby = ({onJoin}:Props)=>{
 
     const {hasBrowserPermission:hasMicPermission} = useMicrophoneState()
     const {hasBrowserPermission:hasCameraPermission} = useCameraState()
-    console.log("hasMicPermission: ",hasMicPermission)
-    console.log("hasCameraPermission: ",hasCameraPermission)
+
 
     const hasBrowserMediaPermission = hasCameraPermission && hasMicPermission
-    console.log("hasBrowserMediaPermission: ",hasBrowserMediaPermission)
+
 
     return (
         <div className="flex flex-col items-center justify-center h-full bg-radial from-sidebar-accent to-sidebar">

@@ -44,11 +44,12 @@ export const MeetingForm = ({onSuccess,onCancel,initialValues}:MeetingFormProps)
 
     const createMeeting = useMutation(
         trpc.meetings.create.mutationOptions({
-            onSuccess:async () =>{
+            onSuccess:async (data) =>{
                await  queryClient.invalidateQueries(trpc.meetings.getMany.queryOptions({}))
                
                //TODO: Invalidate free tier usage 
                 onSuccess?.()
+                router.push(`/meetings/${data.id}`)
             },
             onError: (error) => {
                 toast.error(error.message)
@@ -90,14 +91,14 @@ export const MeetingForm = ({onSuccess,onCancel,initialValues}:MeetingFormProps)
 
 
     const onSubmit = (values: z.infer<typeof MeetingInsertSchema>) => {
-        console.log("Inside Meeting Form values: ", values)
+        
             
         if(isEdit){
             updateMeeting.mutate({...values , id: initialValues.id })
         }
         else {
             createMeeting.mutate(values)
-            router.push(`/meetings/${values.agentId}`)
+      
         }
     }
     

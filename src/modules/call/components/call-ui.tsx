@@ -16,6 +16,8 @@ export const CallUI = ({meetingName}:Props)=>{
     const handleJoin = async ()=>{
         if(!call) return;
         await call.join()
+        const state = call?.state.callingState
+        console.log("Handle Join: ",state)
         setShow("call")
     }
 
@@ -23,7 +25,7 @@ export const CallUI = ({meetingName}:Props)=>{
         if(!call) return;
 
         const state = call?.state.callingState
-        
+        console.log("Handle Leave",state)
         // if(state === "left"){
         //     setShow("ended")
         //     return

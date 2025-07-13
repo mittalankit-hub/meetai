@@ -121,26 +121,26 @@ export const meetingsRouter = createTRPCRouter({
     }),
   
     getOne: protectedProcedure.input(z.object({id:z.string()})).query(async ({input,ctx})=>{
-            const [existingMeeting] = await db.select(
-                // TODO: change to actual count
-                { 
-                ...getTableColumns(meetings),
-                agent: agents,
-                duration: sql<number>`EXTRACT(EPOCH FROM (meetings."ended_at" - meetings."started_at"))`.as("duration"),})
-                .from(meetings)
-                .innerJoin(agents, eq(meetings.agentId, agents.id)) 
-                .where(
-                    and(eq(meetings.id, input.id),
-                        eq(meetings.userId,ctx.auth.session.userId)
-                       ));
+        const [existingMeeting] = await db.select(
+            // TODO: change to actual count
+            { 
+            ...getTableColumns(meetings),
+            agent: agents,
+            duration: sql<number>`EXTRACT(EPOCH FROM (meetings."ended_at" - meetings."started_at"))`.as("duration"),})
+            .from(meetings)
+            .innerJoin(agents, eq(meetings.agentId, agents.id)) 
+            .where(
+                and(eq(meetings.id, input.id),
+                    eq(meetings.userId,ctx.auth.session.userId)
+                   ));
         if (!existingMeeting) {
-            throw new TRPCError({
-                code: 'NOT_FOUND',
-                message: `Meeting with id ${input.id} not found`,
-            });
-        }
-            return existingMeeting;
-        }),
+        throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: `Meeting with id ${input.id} not found`,
+        });
+    }
+        return existingMeeting;
+    }),
     
     
     getMany: protectedProcedure.input(z.object({

@@ -10,9 +10,9 @@ export const useConfirm = (
     description: string,
 ):[()=>JSX.Element,()=>Promise<unknown>] => {
     
-    console.log("useConfirm initialized with title:", title, "and description:", description);
+    
     const [promise, setPromise] = useState<{resolve: (value:boolean)=>void;}| null>(null)
-    console.log("Promise state:", promise);
+    
 
     const confirm =()=>{
                         return new Promise((resolve)=> 

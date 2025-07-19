@@ -1,14 +1,17 @@
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
+import JSONL from "jsonl-parse-stringify";
 import { db } from "@/db";
-import { agents, meetings } from "@/db/schema";
-import { and,count,desc,eq, getTableColumns, ilike, sql } from "drizzle-orm";
+import { agents, meetings, user } from "@/db/schema";
+import { and,count,desc,eq, getTableColumns, ilike, inArray, sql } from "drizzle-orm";
 import z from "zod";
 import { DEFAULT_PAGE_NUM, DEFAULT_PAGE_SIZE, PAGE_SIZE_MAX, PAGE_SIZE_MIN } from "@/constants";
 import { TRPCError } from "@trpc/server";
 import { MeetingInsertSchema, MeetingUpdateSchema } from "../schema";
-import { MeetingStatus } from "../types";
+import { MeetingStatus, StreamTranscription } from "../types";
 import { streamVideo } from "@/lib/stream-video";
 import { generateAvaterUri } from "@/lib/avatar";
+import { name } from "@stream-io/video-react-sdk";
+import { streamChat } from "@/lib/stream-chat";
 
 
 
@@ -222,6 +225,53 @@ export const meetingsRouter = createTRPCRouter({
                 })
             }
         return removedMeeting
+    }),
+
+
+    getTranscript: protectedProcedure.input(z.object({id:z.string()})).query(async ({input,ctx})=>{
+        const [existingMeeting] = await db.select()
+            .from(meetings)
+            .where(
+                and(eq(meetings.id, input.id),
+                    eq(meetings.userId,ctx.auth.session.userId)
+                   ));
+        if (!existingMeeting) {
+        throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: `Meeting with id ${input.id} not found`,
+        });
+    }
+
+    if (!existingMeeting.transcriptUrl) {
+        return []
+    }
+
+    const transcript: StreamTranscription[] = await fetch(existingMeeting.transcriptUrl)
+        .then((res) => res.text())
+        .then((text) => JSONL.parse<StreamTranscription>(text))
+        .catch(() => []);
+    const speakerIds = [...new Set(transcript.map((item: StreamTranscription) => item.speaker_id))];
+    const useSpeakers = await db.select().from(user).where(inArray(user.id,speakerIds)).then((users)=> users.map((user)=>({...user,image:user.image ?? generateAvaterUri({seed: user.name,variant:"initials"})})))
+    const agentSpeakers = await db.select().from(agents).where(inArray(agents.id,speakerIds)).then((agents)=> agents.map((agent)=>({...agent,image: generateAvaterUri({seed: agent.name,variant:"botttsNeutral"})})))
+    const speakers = [...useSpeakers, ...agentSpeakers]
+    
+    const transcriptWithSpeakers = transcript.map((item)=>{
+        const speaker = speakers.find((speaker)=>speaker.id === item.speaker_id)
+        if(!speaker){
+            return{...item ,user:{name:"Unknown",image:generateAvaterUri({seed:"Unknown",variant:"initials"})}}
+        }
+        return {...item ,user:{name:speaker.name,image:speaker.image}}
     })
 
+    return transcriptWithSpeakers;
+    }),
+
+    generateChatToken: protectedProcedure.mutation(async ({ctx})=>{
+        const token = streamChat.createToken(ctx.auth.user.id)
+        await streamChat.upsertUser({
+            id:ctx.auth.user.id,
+            role:"admin"
+        })
+        return token
+    })
 })

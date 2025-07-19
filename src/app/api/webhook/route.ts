@@ -8,7 +8,7 @@
         import {db} from "@/db"
         import {agents,meetings} from "@/db/schema"
         import {streamVideo} from "@/lib/stream-video"
-import { inngest } from "@/inngest/client";
+        import { inngest } from "@/inngest/client";
 
 
         function verifySignatureWithSDK (body:string, signature:string): boolean{
@@ -126,7 +126,7 @@ import { inngest } from "@/inngest/client";
                 if(!updatedMetting){
                     NextResponse.json({error:"Meeting not for for updating transcriptUrl"},{status:404})
                 }
-                //TODO: Call ingest background job to summarize the transcript
+                //Call ingest background job to summarize the transcript
                 await inngest.send({
                     name:"meetings/processing",
                     data:{

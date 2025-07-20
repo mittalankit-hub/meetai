@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
+import { createTRPCRouter, premiumProcedure, protectedProcedure } from "@/trpc/init";
 import {agents} from "@/db/schema";
 import { AgentInsertSchema, AgentUpdateSchema } from "../schema";
 import z from "zod";
@@ -31,14 +31,11 @@ export const agentsRouter = createTRPCRouter({
 
 
 
-    getMany: protectedProcedure
-        .input(z.object({
+    getMany: protectedProcedure.input(z.object({
             page: z.number().default(DEFAULT_PAGE_NUM),
             pageSize: z.number().min(PAGE_SIZE_MIN).max(PAGE_SIZE_MAX).default(DEFAULT_PAGE_SIZE),
             search:z.string().nullish(),
-            })
-        )
-        .query(async ({ctx,input})=>{
+            })).query(async ({ctx,input})=>{
             const{search,page,pageSize} = input;
             const data = await db
                 .select(
@@ -79,7 +76,7 @@ export const agentsRouter = createTRPCRouter({
             }
         ),
 
-    create: protectedProcedure.input(AgentInsertSchema).mutation(async ({input,ctx})=>{
+    create: premiumProcedure("agents").input(AgentInsertSchema).mutation(async ({input,ctx})=>{
 
         const [createdAgent] = await db.insert(agents).values({
             ...input,

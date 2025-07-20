@@ -46,16 +46,19 @@ export const MeetingForm = ({onSuccess,onCancel,initialValues}:MeetingFormProps)
         trpc.meetings.create.mutationOptions({
             onSuccess:async (data) =>{
                await  queryClient.invalidateQueries(trpc.meetings.getMany.queryOptions({}))
-               
-               //TODO: Invalidate free tier usage 
+               await  queryClient.invalidateQueries(trpc.premium.getFreeUsage.queryOptions())
+             
                 onSuccess?.()
                 router.push(`/meetings/${data.id}`)
             },
             onError: (error) => {
                 toast.error(error.message)
+                if(error.data?.code === "FORBIDDEN"){
+                    router.push("/upgrade")
+                }
             },
 
-            //TODO: check if error code FORBIDDEN , redirect to /upgrade
+
         })
     )
 
@@ -74,7 +77,7 @@ export const MeetingForm = ({onSuccess,onCancel,initialValues}:MeetingFormProps)
                 toast.error(error.message)
             },
 
-            //TODO: check if error code FORBIDDEN , redirect to /upgrade
+
         })
     )
 

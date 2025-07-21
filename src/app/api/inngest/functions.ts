@@ -5,7 +5,6 @@ import { StreamTranscription } from "@/modules/meetings/types";
 import { eq, inArray } from "drizzle-orm";
 import JSONL from "jsonl-parse-stringify"
 import {createAgent,openai,TextMessage} from "@inngest/agent-kit"
-import { S } from "node_modules/better-auth/dist/shared/better-auth.Bi8FQwDD";
 
 
 const summarizer = createAgent({

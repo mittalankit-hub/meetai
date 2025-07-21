@@ -10,7 +10,6 @@ import { MeetingInsertSchema, MeetingUpdateSchema } from "../schema";
 import { MeetingStatus, StreamTranscription } from "../types";
 import { streamVideo } from "@/lib/stream-video";
 import { generateAvaterUri } from "@/lib/avatar";
-import { name } from "@stream-io/video-react-sdk";
 import { streamChat } from "@/lib/stream-chat";
 
 

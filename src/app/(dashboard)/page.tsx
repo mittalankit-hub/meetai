@@ -3,19 +3,14 @@ import { HomePage } from "@/modules/home/ui/views/home-view";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+export default async function Page() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
- export const Page = async() => {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+  if (!session) {
+    redirect("/sign-in");
+  }
 
-    if(!session) {
-      redirect("/sign-in");
-    }
-
-    return (
-      <HomePage/>
-    )
+  return <HomePage />;
 }
-
-export default Page;

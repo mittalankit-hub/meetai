@@ -4,13 +4,11 @@ import { LoadingState } from "@/components/loading-state"
 import { authClient } from "@/lib/auth-client"
 import { useTRPC } from "@/trpc/client"
 import { useSuspenseQuery } from "@tanstack/react-query"
-import {  useRouter } from "next/navigation"
 import { PricingCard } from "../components/pricing-card"
 
 
 export const UpgradeView = () => {
 
-    const router = useRouter()
     const trpc = useTRPC()
     const {data:currentSubscriptions} = useSuspenseQuery(trpc.premium.getCurrentSubscription.queryOptions())
     const {data:products} = useSuspenseQuery(trpc.premium.getProducts.queryOptions())

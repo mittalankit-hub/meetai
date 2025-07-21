@@ -1,4 +1,3 @@
-
 import { auth } from "@/lib/auth";
 import MeetingIdView, { MeetingIdErrorView, MeetingIdLoadingView } from "@/modules/meetings/ui/views/meeting-id-view";
 import { getQueryClient, trpc } from "@/trpc/server";
@@ -32,8 +31,6 @@ const session = await auth.api.getSession({
     }catch(error){
         throw error
     }
-
-    // TODO: prefetch 'meetings.getTranscript'
 
     return(
         <HydrationBoundary state={dehydrate(queryClient)}>

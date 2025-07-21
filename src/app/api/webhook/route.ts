@@ -13,9 +13,8 @@
         import OpenAI from "openai"
         import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
         import { generateAvaterUri } from "@/lib/avatar";
-import { error } from "console";
-import { streamChat } from "@/lib/stream-chat";
-import { Variable } from "lucide-react";
+        import { streamChat } from "@/lib/stream-chat";
+
 
         const openaiClient = new OpenAI()
 
@@ -23,11 +22,8 @@ import { Variable } from "lucide-react";
             return streamVideo.verifyWebhook(body,signature)
         }
         export async function POST(req: NextRequest){
-            //console.log(">>>>>>>>>>Inside webhook POST")
             const signature = req.headers.get("x-signature")
-            //console.log("signature: ",signature)
             const apiKey = req.headers.get("x-api-key")
-            //console.log("apiKey: ",apiKey)
 
             if(!signature || !apiKey){
                 return NextResponse.json(
@@ -45,8 +41,7 @@ import { Variable } from "lucide-react";
             //console.log("Payload unkown check:",payload)
             try{
                 payload = JSON.parse(body) as Record<string,unknown>;
-                //console.log("Payload JSON.parse(body):",payload)
-            } catch(error){
+            } catch{
                 return NextResponse.json({error:"Invaild JSON"},{status:400})
             }
 

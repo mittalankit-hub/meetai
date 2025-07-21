@@ -6,6 +6,11 @@ import {polar,checkout,portal} from "@polar-sh/better-auth"
 import {polarClient} from "./polar"
 
 export const auth = betterAuth({
+    trustedOrigins: [
+        "http://localhost:3000",
+        "https://meetai-liart-pi.vercel.app" // ✅ production domain
+      ],
+    
     plugins:[
         polar({
             client:polarClient,

@@ -27,6 +27,8 @@ const session = await auth.api.getSession({
     const queryClient = getQueryClient()
     try{
     queryClient.prefetchQuery(trpc.meetings.getOne.queryOptions({id:meetingId}))
+
+
     }catch(error){
         throw error
     }

@@ -28,7 +28,7 @@
             if(!signature || !apiKey){
                 return NextResponse.json(
                     {error: "Missing Signature or API Key"},
-                    {status:4000}
+                    {status:400}
                 )
             }
             const body = await req.text()
